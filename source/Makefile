@@ -1,32 +1,47 @@
 CXX = g++
-CXXFLAGS = -Wall -O3 -std=c++17
-LDFLAGS =
+CXXFLAGS = -std=c++17 -Wall -O3
 
-# All .cpp files and corresponding .o files
-SRC_FILES = $(wildcard *.cpp)
-OBJ_FILES = $(SRC_FILES:.cpp=.o)
+# Default config
+CONFIG ?= K64N128
 
-# Define special objects
-RUN_TEST_MAIN = run_test.o
-TEST_MAIN     = test.o
+# Map CONFIG to preprocessor define
+DEFS = -DCONFIG_$(CONFIG)
 
-# Object files without the main files
-COMMON_OBJS = $(filter-out $(RUN_TEST_MAIN) $(TEST_MAIN), $(OBJ_FILES))
+# Source files
+SRCS = \
+  argmin.cpp \
+  conv.cpp \
+  enc_dec.cpp \
+  FeedForwardTrellis.cpp \
+  lowRateListDecoder.cpp \
+  minHeap.cpp \
+  run_test.cpp \
+  tbcc_namespace.cpp
 
-# Targets
-EXECUTABLES = clean run_test test
+# Object files
+OBJS = $(SRCS:.cpp=.o)
 
-# Default target
-all: $(EXECUTABLES)
+# Executable name
+TARGET = run_test
 
-run_test: $(RUN_TEST_MAIN) $(COMMON_OBJS)
-	$(CXX) $(LDFLAGS) -o $@ $^
+# Include paths (adjust if headers are in separate dirs)
+INCLUDES = -I.
 
-test: $(TEST_MAIN) $(COMMON_OBJS)
-	$(CXX) $(LDFLAGS) -o $@ $^
+# Rule to build everything
+all: $(TARGET)
 
+# Compile rule
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(DEFS) $(INCLUDES) -c $< -o $@
 
+# Link everything
+$(TARGET): $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
+# Clean build artifacts
 clean:
-	rm -f *.o $(EXECUTABLES)
+	rm -f $(OBJS) $(TARGET)
+
+# Example usage: 
+  # make CONFIG=K64N80
+  # ./run_test -t 0

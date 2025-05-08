@@ -35,6 +35,7 @@ struct MessageInformation{
 	bool listSizeExceeded;
 	double metric;
 	double angle_received_decoded_rad;
+	bool SSD;
 	std::vector<double> pathToTransmittedCodewordHistory;
 	std::vector<double> decodedCodewordSquaredNoiseMag;
 };

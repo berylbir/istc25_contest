@@ -68,6 +68,25 @@ bool crc_check(std::vector<int> input_data, int crc_bits_num, int crc_dec) {
 	return zeros;
 }
 
+// returns the CRC remainder
+int crc_remainder(std::vector<int> input_data, int crc_bits_num, int crc_dec) {
+	std::vector<int> CRC;
+	dec_to_binary(crc_dec, CRC, crc_bits_num);
+
+	for (int ii = 0; ii <= (int)input_data.size() - crc_bits_num; ii++) {
+		if (input_data[ii] == 1) {
+			// Note: transform doesn't include .end
+			std::transform(input_data.begin() + ii, input_data.begin() + (ii + crc_bits_num), CRC.begin(), input_data.begin() + ii, bin_sum);
+		}
+	}
+	// binary to decimal
+	int remainder = 0 ;    
+	for(int i = (int)input_data.size() - crc_bits_num; i < input_data.size() ; i++)
+		remainder = remainder << 1 | input_data[i];
+	
+	return remainder;
+}
+
 void crc_calculation(std::vector<int>& input_data, int crc_bits_num, int crc_dec){
 	// crc_bits_num: the number of CRC bits, redundancy bits number is 1 less.
 	int length = (int)input_data.size();

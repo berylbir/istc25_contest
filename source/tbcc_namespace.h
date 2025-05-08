@@ -30,7 +30,7 @@ std::vector<int> get_point(int output, int n);
 
 // checks the decoded message against the crc
 bool crc_check(std::vector<int> input_data, int crc_bits_num, int crc_dec);
-
+int crc_remainder(std::vector<int> input_data, int crc_bits_num, int crc_dec);
 void crc_calculation(std::vector<int>& input_data, int crc_bits_num, int crc_dec);
 
 } // namespace crc

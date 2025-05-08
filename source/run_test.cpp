@@ -9,7 +9,7 @@
 #include <array>
 #include <fstream>
 #include <sstream>
-#include "tbcc.h"
+#include "conv.h"
 #include "enc_dec.h"
 #include "argmin.h"
 
@@ -18,8 +18,8 @@ const int N_TEST = 12;
 // Define structure for each test point, specifying code parameters and test conditions
 struct test_point
 {
-  int k; // Number of information bits
-  int n; // Number of codeword bits
+  int K; // Number of information bits
+  int N; // Number of codeword bits
   float esno;  // Array of SNR values for testing
   int n_block; // Array of block sizes for testing
   int opt_avg; // Flag to optimize average (versus max) decoding latency
@@ -28,18 +28,18 @@ struct test_point
 // Define set of tests
 test_point contest[N_TEST] =
 {
-  {64,256,1.0,2000,0},   // k=64 R=1/4
-  {128,512,0.1,2000,0},  // k=128 R=1/4
-  {256,1024,0.1,2000,0}, // k=256 R=1/4
-  {512,2048,0.1,2000,0}, // k=512 R=1/4
-  {64,128,-0.5,100000,0},   // k=64 R=1/2
-  {128,256,1.0,2000,0},  // k=128 R=1/2
-  {256,512,1.0,2000,0},  // k=256 R=1/2
-  {512,1024,1.0,2000,0}, // k=512 R=1/2
-  {64,80,3.0,2000,0},    // k=64 R=4/5
-  {128,160,3.0,2000,0},  // k=128 R=4/5
-  {256,320,3.0,2000,0},  // k=256 R=4/5
-  {512,640,3.0,2000,0}   // k=512 R=4/5
+  {64,256,-0.3,2000,0},   // K=64 R=1/4   // ELF-TBCC
+  {128,512,0.1,2000,0},  // K=128 R=1/4
+  {256,1024,0.1,2000,0}, // K=256 R=1/4
+  {512,2048,0.1,2000,0}, // K=512 R=1/4
+  {64,128,-0.5,2000,0},   // K=64 R=1/2   // ELF-TBCC
+  {128,256,1.0,2000,0},  // K=128 R=1/2
+  {256,512,1.0,2000,0},  // K=256 R=1/2
+  {512,1024,1.0,2000,0}, // K=512 R=1/2
+  {64,80,7.5,2000,0},    // K=64 R=4/5   // ELF-ZTCC
+  {128,160,3.0,2000,0},  // K=128 R=4/5
+  {256,320,3.0,2000,0},  // K=256 R=4/5
+  {512,640,3.0,2000,0}   // K=512 R=4/5
 };
 
 // Global defaults
@@ -122,14 +122,14 @@ void channel(const bitvec& cw, float esno, fltvec& llr_out) {
 }
 
 // Run all the tests in one round
-void run_test(int k, int n, float esno, int n_block, int opt_avg, decoder_stats &stats)
+void run_test(int K, int N, float esno, int n_block, int opt_avg, decoder_stats &stats)
 {
   // srand(42);
   // Allocate variables
-  bitvec cw(n);
-  fltvec float_llr(n);
-  bitvec cw_est(n);
-  bitvec info_est(n);
+  bitvec cw(N);
+  fltvec float_llr(N);
+  bitvec cw_est(N);
+  bitvec info_est(N);
 
   // Setup binary RNG
   // std::default_random_engine generator(std::chrono::system_clock::now().time_since_epoch().count());
@@ -140,7 +140,7 @@ void run_test(int k, int n, float esno, int n_block, int opt_avg, decoder_stats 
   enc_dec entry;
 
   // Init encoder and decoder for entry
-  if (entry.init(k,n,opt_avg) != 0) {
+  if (entry.init(K,N,opt_avg) != 0) {
     // This submission does not handle this code
     std::cout << "Handle exception" << std::endl;
   }
@@ -154,9 +154,9 @@ void run_test(int k, int n, float esno, int n_block, int opt_avg, decoder_stats 
   for (int i = 0; i < n_block; ++i)
   {
     if (i % 1000 ==  0) std::cout << "iter: " << i << std::endl;
-    bitvec info(k);
-    // Generate random binary message of length test.k
-    for (int j = 0; j < k; ++j) {
+    bitvec info(K);
+    // Generate random binary message of length test.K
+    for (int j = 0; j < K; ++j) {
         info[j] = distribution(generator); // Random binary message
         // std::cout << info[j] << " ";
     }
@@ -172,7 +172,7 @@ void run_test(int k, int n, float esno, int n_block, int opt_avg, decoder_stats 
     for (int i = 0; i < float_llr.size(); i++) {
       float_llr[i] *= 0.25/snr_linear;
     }
-    
+
     // Decode message
     auto dec_start = std::chrono::high_resolution_clock::now();
     int detect = entry.decode(float_llr, cw_est, info_est);
@@ -203,12 +203,12 @@ void run_test_number(int t, decoder_stats &stats)
 {
   // Allocate variables
   test_point &test = contest[t];
-  bitvec info(test.k);
-  bitvec cw(test.n);
-  fltvec float_llr(test.n);
-  llrvec llr(test.n);
-  bitvec cw_est(test.n);
-  bitvec info_est(test.n);
+  bitvec info(test.K);
+  bitvec cw(test.N);
+  fltvec float_llr(test.N);
+  llrvec llr(test.N);
+  bitvec cw_est(test.N);
+  bitvec info_est(test.N);
 
   // Setup binary RNG
   std::default_random_engine generator(std::chrono::system_clock::now().time_since_epoch().count());
@@ -218,7 +218,7 @@ void run_test_number(int t, decoder_stats &stats)
   enc_dec entry;
 
   // Init encoder and decoder for entry
-  if (entry.init(test.k,test.n,test.opt_avg) != 0) {
+  if (entry.init(test.K,test.N,test.opt_avg) != 0) {
     // This submission does not handle this code
     std::cout << "Handle exception" << std::endl;
   }
@@ -230,7 +230,7 @@ void run_test_number(int t, decoder_stats &stats)
   if (default_esno > 0.0) esno = default_esno;
   if (default_nblock > 0) n_block = default_nblock;
 
-  run_test(test.k, test.n, esno, n_block, test.opt_avg, stats);
+  run_test(test.K, test.N, esno, n_block, test.opt_avg, stats);
 }
 
 
@@ -241,7 +241,7 @@ void run_single_test(int test_number) {
 
     // Run the specified test and output results
     test_point &test = contest[test_number];
-    run_test(test.k, test.n, test.esno, test.n_block, test.opt_avg, run_stats);
+    run_test(test.K, test.N, test.esno, test.n_block, test.opt_avg, run_stats);
     int n_sample = run_stats.n_sample();
     auto sum = run_stats.sum();
     std::array<float, 4> mean;
@@ -251,7 +251,7 @@ void run_single_test(int test_number) {
     //std::cout << n_sample << std::endl;
     std::cout << "Test " << test_number << ": "
               << "Block: " << sum[0] << "/" << n_sample << " = " << mean[0] << ", "
-              << "Info Bit Errors: " << sum[1]  << "/" << n_sample*contest[test_number].k << " = " << contest[test_number].k*mean[1] << ", "
+              << "Info Bit Errors: " << sum[1]  << "/" << n_sample*contest[test_number].K << " = " << contest[test_number].K*mean[1] << ", "
               << "Encoding Time (ns): " << sum[2]  << "/" << n_sample << " = " << mean[2] << ", "
               << "Decoding Time (\xC2\xB5s): " << sum[3]  << "/" << n_sample << " = " << mean[3] << ", " << std::endl;
 }
@@ -282,17 +282,17 @@ void run_test_file(std::string filename, std::string output_filename) {
     std::string line;
     while (std::getline(file, line)) {
         std::istringstream iss(line);
-        int k, n, n_block, opt_avg;
+        int K, N, n_block, opt_avg;
         float esno;
 
-        // For each line, read 4 parameters: int k, int n, float esno, int n_block
-        if (!(iss >> k >> n >> esno >> n_block >> opt_avg)) {
+        // For each line, read 4 parameters: int K, int N, float esno, int n_block
+        if (!(iss >> K >> N >> esno >> n_block >> opt_avg)) {
             std::cerr << "Error reading line: " << line << std::endl;
             continue;
         }
 
         // Run test with given parameters
-        run_test(k, n, esno, n_block, opt_avg, run_stats);
+        run_test(K, N, esno, n_block, opt_avg, run_stats);
 
         // Process results
         int n_sample = run_stats.n_sample();
@@ -303,15 +303,15 @@ void run_test_file(std::string filename, std::string output_filename) {
         }
 
         // Report results
-        *outputStream << "Test with parameters (k=" << k << ", n=" << n << ", esno=" << esno << ", n_block=" << n_block << "): "
+        *outputStream << "Test with parameters (K=" << K << ", N=" << N << ", esno=" << esno << ", n_block=" << n_block << "): "
                   << "Block: " << sum[0] << "/" << n_sample << " = " << mean[0] << ", "
-                  << "Info Bit Errors: " << sum[1]  << "/" << n_sample*k << " = " << k*mean[1] << ", "
+                  << "Info Bit Errors: " << sum[1]  << "/" << n_sample*K << " = " << K*mean[1] << ", "
                   << "Encoding Time (ns): " << sum[2]  << "/" << n_sample << " = " << mean[2] << ", "
                   << "Decoding Time (\xC2\xB5s): " << sum[3]  << "/" << n_sample << " = " << mean[3] << ", " << std::endl;
 
         // Write stats
         if (!output_filename.empty()) {
-          std::string suffix = std::to_string(k) + "_" + std::to_string(n) + "_" + std::to_string(n_block);
+          std::string suffix = std::to_string(K) + "_" + std::to_string(N) + "_" + std::to_string(n_block);
           std::ofstream statStream(output_filename + suffix);
           run_stats.print(&statStream);
         }

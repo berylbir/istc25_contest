@@ -13,16 +13,12 @@
 
 class LowRateListDecoder{
 public:
-	LowRateListDecoder(FeedForwardTrellis FT, int listSize, int crcDegree, int crc, char stopping_rule);
+	LowRateListDecoder(FeedForwardTrellis FT, int listSize, int crcDegree, int crc, char code_type);
 	MessageInformation lowRateDecoding_MaxListsize(std::vector<float> receivedMessage, std::vector<int> punctured_indices);
-	MessageInformation lowRateDecoding_MaxMetric(std::vector<float> receivedMessage, std::vector<int> punctured_indices);
-	MessageInformation lowRateDecoding_MaxAngle(std::vector<float> receivedMessage, std::vector<int> punctured_indices);
-	MessageInformation lowRateDecoding_MaxAngle_ProductMetric(std::vector<float> receivedMessage, std::vector<int> punctured_indices);
-
+	MessageInformation SSD_SLVD_TB(std::vector<float> receivedMessage, std::vector<int> punctured_indices);
+	MessageInformation SSD_SLVD_ZT(std::vector<float> receivedMessage);
 	MessageInformation decode(std::vector<float> receivedMessage, std::vector<int> punctured_indices);
 
-	/* - MLA - */
-	MessageInformation lowRateDecoding_mla(std::vector<float> receivedMessage, std::vector<int> punctured_indices, std::vector<int> transmittedMessage);
 
 private:
 	int numForwardPaths;
@@ -30,7 +26,7 @@ private:
 	int crcDegree;
 	int crc;
 	int n;
-	char stopping_rule;
+	char code_type;
 
 	std::vector<std::vector<int>> lowrate_nextStates;
 	std::vector<std::vector<int>> lowrate_outputs;
@@ -51,11 +47,10 @@ private:
 
   std::vector<int> pathToMessage(std::vector<int>); 
   std::vector<int> pathToCodeword(std::vector<int>); 
-	std::vector<std::vector<cell>> constructLowRateTrellis(std::vector<float> receivedMessage);
+  void readNeighborList(std::string path);
+  std::vector<std::vector<cell>> constructLowRateTrellis(std::vector<float> receivedMessage);
+  std::vector<std::vector<cell>> constructLowRateTrellis_ZT(std::vector<float> receivedMessage);
   std::vector<std::vector<cell>> constructLowRateTrellis_Punctured(std::vector<float> receivedMessage, std::vector<int> punctured_indices);
-	std::vector<std::vector<cell>> constructLowRateTrellis_Punctured_ProductMetric(std::vector<float> receivedMessage, std::vector<int> punctured_indices);
-	std::vector<std::vector<std::vector<cell>>> constructLowRateMultiTrellis(std::vector<float> receivedMessage);
-	std::vector<std::vector<cell>> constructMinimumLikelihoodLowRateTrellis(std::vector<float> receivedMessage);
 };
 
 

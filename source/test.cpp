@@ -4,15 +4,15 @@
 #include <cmath>
 #include <chrono>
 #include <algorithm>
-#include "tbcc.h"
+#include "conv.h"
 
 // Function declarations for tests
-// void test_no_error(tbcc &code, int verbose = 0);
-// void test_single_error(tbcc &code, float llr_mag, int verbose = 0);
-// int test_gaussian_noise(tbcc &code, float esno, int verbose = 0);
-// void test_tbcc_encoder(tbcc &code, int verbose = 0);
+// void test_no_error(conv &code, int verbose = 0);
+// void test_single_error(conv &code, float llr_mag, int verbose = 0);
+// int test_gaussian_noise(conv &code, float esno, int verbose = 0);
+// void test_tbcc_encoder(conv &code, int verbose = 0);
 
-// void test_no_error(tbcc &code, int verbose) {
+// void test_no_error(conv &code, int verbose) {
 //     intvec info(N, 0); // Initialize info bits to zero
 //     intvec cw(N);
 //     fltvec llr(N);
@@ -50,7 +50,7 @@
 //     }
 // }
 
-// void test_single_error(tbcc &code, float llr_mag, int verbose) {
+// void test_single_error(conv &code, float llr_mag, int verbose) {
 //     intvec info(code.n_cols, 0); // Initialize info bits to zero
 //     intvec cw(code.n_cols);
 //     fltvec llr(code.n_cols);
@@ -89,7 +89,7 @@
 //     }
 // }
 
-// int test_gaussian_noise(tbcc &code, float esno, int verbose) {
+// int test_gaussian_noise(conv &code, float esno, int verbose) {
 //     // Setup
 //     intvec info(N, 0); // Initialize info bits to zero
 //     intvec cw;
@@ -148,10 +148,10 @@
 // }
 
 
-// // Test tbcc::create_encoder and tbcc::encode
-// void test_tbcc_encode(tbcc &code, int verbose) {
+// // Test conv::create_encoder and conv::encode
+// void test_tbcc_encode(conv &code, int verbose) {
 
-//     // Call tbcc::create_encoder to create the parity generator
+//     // Call conv::create_encoder to create the parity generator
 //     code.create_encoder(verbose);
 
 
@@ -159,10 +159,10 @@
 //     std::default_random_engine generator(std::chrono::system_clock::now().time_since_epoch().count());
 //     std::uniform_int_distribution<int> distribution(0, 1);
 
-//     // Generate random information bit string and call tbcc::encode
-//     intvec info(K);
+//     // Generate random information bit string and call conv::encode
+//     intvec info(k);
 //     std::generate(info.begin(), info.end(), [&]() { return distribution(generator); });
-//     intvec cw(N);
+//     intvec cw(n);
 //     code.encode(info, cw);
 // }
 
@@ -170,12 +170,12 @@
 int main(int argc, char* argv[])
 {
     return 0;
-    tbcc code;
+    conv code;
     
     // Test encoder
     // test_tbcc_encode(code, 1);
 
-    // Generate short tbcc code
+    // Generate short conv code
 
     // Run test functions
     // test_tbcc_encode(code, 0);
