@@ -1,14 +1,14 @@
 We use BPSK, so EsNo = EcNo in dB.
 
 //// K=64, N=80 ELF-ZTCC r=6, Lmax=256 ////
-FER = , EsN0 =  dB
-FER =  , EsN0 =   dB
+FER = 1.1e-3, EsN0 = 3.8 dB
+FER = 1.5907e-5, EsN0 = 5.1 dB
 
 //// K=64, N=128 ELF-TBCC r=12, Lmax=8192 ////
-FER = 1.3928e-03, EsN0 = -0.5 dB
-FER = 8.2865e-06, EsN0 = 0.5 dB
+FER = 1.3928e-3, EsN0 = -0.5 dB
+FER = 8.2865e-6, EsN0 = 0.5 dB
 
 //// K=64, N=256 ELF-TBCC r=25, Lmax=16384 ////
-FER =  , EsN0 =  dB
-FER =  , EsN0 =  dB 
+FER = 1.04e-3, EsN0 = -4.4 dB
+FER = 9.6339e-6, EsN0 = -3.5 dB 
 

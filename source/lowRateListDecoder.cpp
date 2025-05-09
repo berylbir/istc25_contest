@@ -273,7 +273,6 @@ MessageInformation LowRateListDecoder::SSD_SLVD_TB(std::vector<float> receivedMe
 
 // SSD-SLVD for zero-terminated convolutional codes without puncturing
 MessageInformation LowRateListDecoder::SSD_SLVD_ZT(std::vector<float> receivedMessage){
-	std::cout << "Received message size: " << receivedMessage.size() << std::endl;
 	// trellisInfo is indexed [state][stage]
 	std::vector<std::vector<cell>> trellisInfo;
 	trellisInfo = constructLowRateTrellis_ZT(receivedMessage);
@@ -353,15 +352,7 @@ MessageInformation LowRateListDecoder::SSD_SLVD_ZT(std::vector<float> receivedMe
 		previousPaths.push_back(path);
 
 		std::vector<int> message = pathToMessage_ZT(path);
-		// for (int i=0; i<message.size(); i++){
-		// 	std::cout << message[i];
-		// }
-		// std::cout << std::endl;
 		std::vector<int> codeword = pathToCodeword(path);
-		// for (int i=0; i<codeword.size(); i++){
-		// 	std::cout << codeword[i];
-		// }
-		// std::cout << std::endl;
 		int ED = crc::crc_remainder(message, crcDegree, crc);
 
 		// return if SLVD finds ELF-TB codeword
