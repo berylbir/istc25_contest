@@ -28,7 +28,7 @@ struct test_point
 // Define set of tests
 test_point contest[N_TEST] =
 {
-  {64,256,-0.3,2000,0},   // K=64 R=1/4   // ELF-TBCC
+  {64,256,-3.5,10000000,0},   // K=64 R=1/4   // ELF-TBCC
   {128,512,0.1,2000,0},  // K=128 R=1/4
   {256,1024,0.1,2000,0}, // K=256 R=1/4
   {512,2048,0.1,2000,0}, // K=512 R=1/4
@@ -153,7 +153,7 @@ void run_test(int K, int N, float esno, int n_block, int opt_avg, decoder_stats 
   // Run tests
   for (int i = 0; i < n_block; ++i)
   {
-    if (i % 1000 ==  0) std::cout << "iter: " << i << std::endl;
+    if (i % 1000 ==  0) std::cout << "iter: " << i  << " num errors " << block_error << std::endl;
     bitvec info(K);
     // Generate random binary message of length test.K
     for (int j = 0; j < K; ++j) {

@@ -116,7 +116,7 @@ std::vector<int> FeedForwardTrellis::encode_zt(std::vector<int> originalMessage)
 			output.push_back(outputBinary[j]);
 		}
 	}
-	return originalMessage;
+	return output;
 }
 
 std::vector<int> FeedForwardTrellis::dec2Bin(int decimal, int length){

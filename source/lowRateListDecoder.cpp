@@ -273,6 +273,7 @@ MessageInformation LowRateListDecoder::SSD_SLVD_TB(std::vector<float> receivedMe
 
 // SSD-SLVD for zero-terminated convolutional codes without puncturing
 MessageInformation LowRateListDecoder::SSD_SLVD_ZT(std::vector<float> receivedMessage){
+	std::cout << "Received message size: " << receivedMessage.size() << std::endl;
 	// trellisInfo is indexed [state][stage]
 	std::vector<std::vector<cell>> trellisInfo;
 	trellisInfo = constructLowRateTrellis_ZT(receivedMessage);
@@ -283,14 +284,11 @@ MessageInformation LowRateListDecoder::SSD_SLVD_ZT(std::vector<float> receivedMe
 	MinHeap detourTree;
 	std::vector<std::vector<int>> previousPaths;
 	
-
-	// create nodes for each valid ending state with no detours
-	for(int i = 0; i < lowrate_numStates; i++){
-		DetourObject detour;
-		detour.startingState = i;
-		detour.pathMetric = trellisInfo[i][lowrate_pathLength - 1].pathMetric;
-		detourTree.insert(detour);
-	}
+	// ZTCC only detours from state 0
+	DetourObject detour;
+	detour.startingState = 0;
+	detour.pathMetric = trellisInfo[0][lowrate_pathLength - 1].pathMetric;
+	detourTree.insert(detour);
 
 	int numPathsSearched = 0;
 	float metric_to_beat = INT_MAX;
@@ -354,8 +352,16 @@ MessageInformation LowRateListDecoder::SSD_SLVD_ZT(std::vector<float> receivedMe
 		
 		previousPaths.push_back(path);
 
-		std::vector<int> message = pathToMessage(path);
+		std::vector<int> message = pathToMessage_ZT(path);
+		// for (int i=0; i<message.size(); i++){
+		// 	std::cout << message[i];
+		// }
+		// std::cout << std::endl;
 		std::vector<int> codeword = pathToCodeword(path);
+		// for (int i=0; i<codeword.size(); i++){
+		// 	std::cout << codeword[i];
+		// }
+		// std::cout << std::endl;
 		int ED = crc::crc_remainder(message, crcDegree, crc);
 
 		// return if SLVD finds ELF-TB codeword
@@ -655,6 +661,18 @@ std::vector<std::vector<LowRateListDecoder::cell>> LowRateListDecoder::construct
 std::vector<int> LowRateListDecoder::pathToMessage(std::vector<int> path){
 	std::vector<int> message;
 	for(int pathIndex = 0; pathIndex < path.size() - 1; pathIndex++){
+		for(int forwardPath = 0; forwardPath < numForwardPaths; forwardPath++){
+			if(lowrate_nextStates[path[pathIndex]][forwardPath] == path[pathIndex + 1])
+				message.push_back(forwardPath);
+		}
+	}
+	return message;
+}
+
+// converts a path through the ztcc trellis to the binary message it corresponds with
+std::vector<int> LowRateListDecoder::pathToMessage_ZT(std::vector<int> path){
+	std::vector<int> message;
+	for(int pathIndex = 0; pathIndex < path.size() - 1 - V; pathIndex++){
 		for(int forwardPath = 0; forwardPath < numForwardPaths; forwardPath++){
 			if(lowrate_nextStates[path[pathIndex]][forwardPath] == path[pathIndex + 1])
 				message.push_back(forwardPath);

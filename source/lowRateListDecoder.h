@@ -46,6 +46,7 @@ private:
 	};
 
   std::vector<int> pathToMessage(std::vector<int>); 
+  std::vector<int> pathToMessage_ZT(std::vector<int> path);
   std::vector<int> pathToCodeword(std::vector<int>); 
   void readNeighborList(std::string path);
   std::vector<std::vector<cell>> constructLowRateTrellis(std::vector<float> receivedMessage);
